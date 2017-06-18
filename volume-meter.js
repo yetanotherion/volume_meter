@@ -45,11 +45,12 @@ function createAudioMeter(audioContext, mediaStreamSource) {
  */
 function start(audioContext, mediaStreamSource) {
     var meter = createAudioMeter(audioContext, mediaStreamSource);
+    var callEveryMs = 100;
     var meterRunner = {
         ended: false,
         meter: meter,
         i: -1,
-        plotEvery: 25,
+        plotEvery: 5,
         data: [],
         delay: [],
         pushData: function() {
@@ -66,26 +67,28 @@ function start(audioContext, mediaStreamSource) {
             this.pushData();
             this.i += 1;
             if (this.i % this.plotEvery == 0) {
-                plotData(this.data, "volume");
-                plotData(this.delay, "delay");
+                var views = chrome.extension.getViews({type: "popup"});
+                for (var i = 0; i < views.length; i++) {
+                    var view = views[i];
+                    if (view.plotData) {
+                        view.plotData(this.data, "volume");
+                        view.plotData(this.delay, "delay");
+                    }
+                }
                 this.i = 0;
             }
         },
         stop: function () {
             this.ended = true;
-            if (this.rafId != null) {
-                window.cancelAnimationFrame(this.rafId);
-                this.rafId = null;
+            if (this.refreshIntervalId != null) {
+                clearInterval(this.refreshIntervalId);
+                this.refreshIntervalId = null;
             }
         },
-        rafId: null
+        refreshIntervalId: null,
     };
-
-    function measureLoop() {
-        if (meterRunner.ended) return;
+    this.refreshIntervalId = setInterval(function () {
         meterRunner.measureAndPlotIfNeeded();
-        meterRunner.rafId = window.requestAnimationFrame(measureLoop);
-    }
-    measureLoop();
+    }, callEveryMs);
     return meterRunner;
 }

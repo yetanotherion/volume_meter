@@ -4,6 +4,20 @@
     "version": "0.1",
     "description": "Measures the volume of the sound from a given laptop's mic",
     "options_page": "options.html",
+    "background": {
+        "persistent": true,
+        "scripts": [
+            /* Include the volume meter component */
+            "volume-meter.js",
+            /* Include the component to load user media */
+            "load-user-media.js",
+            /* Include the main app logic */
+            "bg.js"
+        ]
+    },
+    "permissions": [
+        "background"
+    ],
     "browser_action": {
         "default_title": "",
         "default_icon": "icon.png",
