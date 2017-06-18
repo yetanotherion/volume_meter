@@ -1,4 +1,4 @@
-function plotData(data) {
+function plotData(data, divId) {
     var margin = {
         top: 30,
         right: 20,
@@ -20,28 +20,23 @@ function plotData(data) {
             return x(d.date);
         })
         .y(function (d) {
-            return y(d.volume);
+            return y(d.y);
         });
-
-    d3.select("svg").remove();
-    var svg = d3.select("#volume")
+    var divSelector = "#" + divId;
+    d3.select(divSelector).select("svg").remove();
+    var svg = d3.select(divSelector)
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    data.forEach(function (d) {
-        d.date = d.date;
-        d.volume = d.volume;
-    });
-
     // Scale the range of the data
     x.domain(d3.extent(data, function (d) {
         return d.date;
         }));
     y.domain([0, d3.max(data, function (d) {
-        return d.volume;
+        return d.y;
         })]);
 
     svg.append("path") // Add the valueline path.

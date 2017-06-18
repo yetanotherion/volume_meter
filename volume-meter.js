@@ -51,15 +51,23 @@ function start(audioContext, mediaStreamSource) {
         i: -1,
         plotEvery: 25,
         data: [],
+        delay: [],
         pushData: function() {
-            this.data.push({date: new Date().getTime(),
-                            volume: this.meter.getRmsVolume()});
+            var currTime = new Date().getTime();
+            var prevIndex = this.data.length - 1;
+            if (prevIndex > 0) {
+                this.delay.push({date: currTime,
+                                 y: currTime - this.data[prevIndex].date})
+            }
+            this.data.push({date: currTime,
+                            y: this.meter.getRmsVolume()});
         },
         measureAndPlotIfNeeded: function() {
             this.pushData();
             this.i += 1;
             if (this.i % this.plotEvery == 0) {
-                plotData(this.data);
+                plotData(this.data, "volume");
+                plotData(this.delay, "delay");
                 this.i = 0;
             }
         },
