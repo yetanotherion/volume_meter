@@ -12,9 +12,8 @@
  * given in array. The unit of measured samples is a byte between 0-255, (
  * mapping to (-1, 1), -1 being minDb and +1 maxDb.
  */
-var i = 0;
 function getRmsVolume(analyser, array) {
-    analyser.getByteTimeDomainData(array);
+    analyser.getFloatTimeDomainData(array);
     const length = array.length;
     let total = 0;
     for (let i = 0; i < length; i++) {
@@ -29,7 +28,7 @@ function getRmsVolume(analyser, array) {
 function createAudioMeter(audioContext, mediaStreamSource) {
     var analyser = audioContext.createAnalyser();
     analyser.fftSize = 256;
-    var array = new Uint8Array(analyser.frequencyBinCount);
+    var array = new Float32Array(analyser.frequencyBinCount);
     mediaStreamSource.connect(analyser);
     return {analyser: analyser,
             array: array,
