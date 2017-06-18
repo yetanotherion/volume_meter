@@ -48,6 +48,21 @@ function start(audioContext, mediaStreamSource) {
     var meterRunner = {
         ended: false,
         meter: meter,
+        i: -1,
+        plotEvery: 25,
+        data: [],
+        pushData: function() {
+            this.data.push({date: new Date().getTime(),
+                            volume: this.meter.getRmsVolume()});
+        },
+        measureAndPlotIfNeeded: function() {
+            this.pushData();
+            this.i += 1;
+            if (this.i % this.plotEvery == 0) {
+                plotData(this.data);
+                this.i = 0;
+            }
+        },
         stop: function () {
             this.ended = true;
             if (this.rafId != null) {
@@ -57,9 +72,10 @@ function start(audioContext, mediaStreamSource) {
         },
         rafId: null
     };
+
     function measureLoop() {
         if (meterRunner.ended) return;
-        var volume = meterRunner.meter.getRmsVolume();
+        meterRunner.measureAndPlotIfNeeded();
         meterRunner.rafId = window.requestAnimationFrame(measureLoop);
     }
     measureLoop();
