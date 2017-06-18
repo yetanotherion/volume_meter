@@ -1,3 +1,4 @@
+/* Mostly taken from https://github.com/cwilso/volume-meter */
 window.onload = function() {
 
     // monkeypatch Web Audio
@@ -31,7 +32,6 @@ window.onload = function() {
         alert('getUserMedia threw exception :' + e);
     }
 }
-
 
 function didntGetStream() {
     alert('Stream generation failed.');
