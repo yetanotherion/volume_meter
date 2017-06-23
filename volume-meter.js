@@ -50,18 +50,21 @@ function start(audioContext, mediaStreamSource) {
         ended: false,
         meter: meter,
         i: -1,
-        plotEvery: 5,
+        plotEvery: 10,
         data: [],
         delay: [],
+        formatData: function(x, y) {
+            return [x,y];
+        },
         pushData: function() {
             var currTime = new Date().getTime();
             var prevIndex = this.data.length - 1;
             if (prevIndex > 0) {
-                this.delay.push({date: currTime,
-                                 y: currTime - this.data[prevIndex].date})
+                var delay = currTime - this.data[prevIndex][0]
+                this.delay.push(this.formatData(currTime, delay));
             }
-            this.data.push({date: currTime,
-                            y: this.meter.getRmsVolume()});
+            this.data.push(this.formatData(currTime,
+                                           this.meter.getRmsVolume()));
         },
         measureAndPlotIfNeeded: function() {
             this.pushData();
@@ -71,8 +74,12 @@ function start(audioContext, mediaStreamSource) {
                 for (var i = 0; i < views.length; i++) {
                     var view = views[i];
                     if (view.plotData) {
-                        view.plotData(this.data, "volume");
-                        view.plotData(this.delay, "delay");
+                        view.plotData(this.data, {"title": "volume",
+                                                  "yAxisTitle": "dB"},
+                                      "volume");
+                        view.plotData(this.delay, {"title": "delay",
+                                                   "yAxisTitle": "ms"},
+                                      "delay");
                     }
                 }
                 this.i = 0;
