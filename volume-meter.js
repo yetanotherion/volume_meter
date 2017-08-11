@@ -7,19 +7,25 @@
  * https://stackoverflow.com/questions/24083349/understanding-getbytetimedomaindata-and-getbytefrequencydata-in-web-audio
  */
 
+
+function smoothVolume(value) {
+    return value / 255;
+}
+
 /**
  * Compute the rms (root mean square) of all measured samples
  * given in array. The unit of measured samples in dB units.
  */
 function getRmsVolume(analyser, array) {
-    analyser.getFloatTimeDomainData(array);
+    analyser.getByteTimeDomainData(array);
     const length = array.length;
     let total = 0;
     for (let i = 0; i < length; i++) {
         total += array[i] * array[i];
     }
-    return Math.sqrt(total / length);
+    return smoothVolume(Math.sqrt(total / length));
 }
+
 
 /**
  * Returns an object with the getRmsVolume method.
@@ -27,7 +33,7 @@ function getRmsVolume(analyser, array) {
 function createAudioMeter(audioContext, mediaStreamSource) {
     var analyser = audioContext.createAnalyser();
     analyser.fftSize = 256;
-    var array = new Float32Array(analyser.frequencyBinCount);
+    var array = new Uint8Array(analyser.fftSize);
     mediaStreamSource.connect(analyser);
     return {analyser: analyser,
             array: array,
@@ -75,7 +81,7 @@ function start(audioContext, mediaStreamSource) {
                     var view = views[i];
                     if (view.plotData) {
                         view.plotData(this.data, {"title": "volume",
-                                                  "yAxisTitle": "dB"},
+                                                  "yAxisTitle": ""},
                                       "volume");
                         view.plotData(this.delay, {"title": "delay",
                                                    "yAxisTitle": "ms"},
