@@ -58,9 +58,16 @@ function start(audioContext, mediaStreamSource) {
         i: -1,
         plotEvery: 10,
         data: [],
+        plottedWindowSize: 100,
         delay: [],
         formatData: function(x, y) {
             return [x,y];
+        },
+        manageDataWindow: function() {
+            if (this.data.length > this.plottedWindowSize) {
+                const toRemove = this.data.length - this.plottedWindowSize
+                this.data = this.data.slice(toRemove, this.data.length);
+            }
         },
         pushData: function() {
             var currTime = new Date().getTime();
@@ -69,6 +76,7 @@ function start(audioContext, mediaStreamSource) {
                 var delay = currTime - this.data[prevIndex][0]
                 this.delay.push(this.formatData(currTime, delay));
             }
+            this.manageDataWindow();
             this.data.push(this.formatData(currTime,
                                            this.meter.getRmsVolume()));
         },
