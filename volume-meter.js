@@ -1,29 +1,26 @@
-/**
- * https://webaudio.github.io/web-audio-api/#widl-AnalyserNode-getByteFrequencyData-void-Uint8Array-array
- * getByte: value between 0 and 255.
- * getFloat: dB
- * getTime: waveform
- * getFrequency: after fft https://webaudio.github.io/web-audio-api/#current-frequency-data
- * https://stackoverflow.com/questions/24083349/understanding-getbytetimedomaindata-and-getbytefrequencydata-in-web-audio
- */
-
-
-function smoothVolume(value) {
-    return value / 255;
+/* https://webaudio.github.io/web-audio-api/*/
+/* https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Basic_concepts_behind_Web_Audio_API
+   downmixed -> assuming the mic is stereo,
+   output.M = 0.5 * (input.L + input.R) */
+/* x[k] = down-mixed time domain (waveform) data
+/* b[k] = 128 * (1 + x[k]) */
+function backToTimeDomainData(value) {
+    return value / 128 - 1;
 }
 
 /**
- * Compute the rms (root mean square) of all measured samples
- * given in array. The unit of measured samples in dB units.
+ * Compute the rms (root mean square) of all measured
+   down-mixed time domain datas (see above).
  */
 function getRmsVolume(analyser, array) {
     analyser.getByteTimeDomainData(array);
     const length = array.length;
     let total = 0;
     for (let i = 0; i < length; i++) {
-        total += array[i] * array[i];
+        var value = backToTimeDomainData(array[i]);
+        total += value * value;
     }
-    return smoothVolume(Math.sqrt(total / length));
+    return Math.sqrt(total / length);
 }
 
 
