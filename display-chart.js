@@ -13,6 +13,17 @@ function plotData(data, options, divId) {
         chart.redraw(true);
     }
     else {
+        function createYAxis(options) {
+            var res = {
+                title: {
+                    text: options.yAxisTitle
+                }
+            }
+            if (typeof options.yTickPositions != "undefined") {
+                res.tickPositions = options.yTickPositions;
+            }
+            return res;
+        };
         charts[divId] = new Highcharts.chart(divId, {
             chart: {
                 zoomType: 'x'
@@ -26,11 +37,7 @@ function plotData(data, options, divId) {
             xAxis: {
                 type: 'datetime'
             },
-            yAxis: {
-                title: {
-                    text: options.yAxisTitle
-                }
-            },
+            yAxis: createYAxis(options),
             legend: {
                 enabled: false
             },

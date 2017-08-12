@@ -86,7 +86,8 @@ function start(audioContext, mediaStreamSource) {
                     var view = views[i];
                     if (view.plotData) {
                         view.plotData(this.data, {"title": "volume",
-                                                  "yAxisTitle": ""},
+                                                  "yAxisTitle": "",
+                                                  "yTickPositions": [0.0, 0.1, 0.2, 0.3]},
                                       "volume");
                         view.plotData(this.delay, {"title": "delay",
                                                    "yAxisTitle": "ms"},
